@@ -8,7 +8,9 @@
   <!-- Предзагрузка -->
   <link rel="preload" href="fonts/BenzinBold.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="video/promo.mp4" as="video" type="video/mp4">
+  <link rel="preload" href="video/second-video.mp4" as="video" type="video/mp4">
   <link rel="preload" href="images/preview.png" as="image">
+  <link rel="preload" href="images/preview2.png" as="image">
 
   <style>
     @font-face {
@@ -98,9 +100,24 @@
       box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
       background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(15px);
+      margin-bottom: 25px;
+    }
+
+    .second-video-section {
+      margin-top: 40px;
+      margin-bottom: 25px;
     }
 
     video {
+      width: 100%;
+      height: auto;
+      border-radius: 20px;
+      display: block;
+      object-fit: cover;
+      background-color: #000;
+    }
+
+    .video-preview {
       width: 100%;
       height: auto;
       border-radius: 20px;
@@ -127,6 +144,28 @@
     }
 
     .play-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 25px rgba(255, 125, 0, 0.6);
+    }
+
+    .play-button-second {
+      margin-top: 25px;
+      background: linear-gradient(135deg, #ff7b00, #ff2d55);
+      color: white;
+      font-family: "BenzinBold", "Inter", sans-serif;
+      font-size: clamp(16px, 5vw, 20px);
+      padding: 16px 40px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(255, 90, 0, 0.5);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: pulse 2s infinite;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .play-button-second:hover {
       transform: scale(1.05);
       box-shadow: 0 12px 25px rgba(255, 125, 0, 0.6);
     }
@@ -229,6 +268,7 @@
   </div>
 
   <div class="container" id="mainContent">
+    <!-- Первое видео -->
     <div class="video-section">
       <video id="promoVideo" preload="auto" poster="image/preview.png" playsinline>
         <source src="video/promo.mp4" type="video/mp4">
@@ -240,9 +280,20 @@
 
     <h2>НАЧНИ ИГРАТЬ</h2>
     <a href="https://t.me/+xtxhl0Vu2bE1OTNi" target="_blank" class="tg-button">Перейти в Telegram</a>
+
+    <!-- Второе видео -->
+    <div class="video-section second-video-section">
+      <video id="secondVideo" preload="auto" poster="image/preview2.png" playsinline>
+        <source src="video/second-video.mp4" type="video/mp4">
+        Ваш браузер не поддерживает видео.
+      </video>
+    </div>
+
+    <button class="play-button-second" id="playBtnSecond">ИСПЫТАТЬ УДАЧУ</button>
   </div>
 
-  <div class="popup" id="popup">
+  <!-- Первый попап (для первого видео) -->
+  <div class="popup" id="popup1">
     <div class="popup-content">
       <h3>💰 Вы могли выиграть 241 250 ₽!</h3>
       <p>Попробуй прямо сейчас — удача может быть на твоей стороне.</p>
@@ -250,36 +301,82 @@
     </div>
   </div>
 
+  <!-- Второй попап (для второго видео) -->
+  <div class="popup" id="popup2">
+    <div class="popup-content">
+      <h3>💰 Вы могли выиграть 53 067 ₽!</h3>
+      <p>Не упусти свой шанс выиграть крупную сумму. Начни играть сейчас!</p>
+      <a href="https://t.me/+Mm6pRnn1_QgxYzNi" target="_blank" class="tg-button">Испытать удачу</a>
+    </div>
+  </div>
+
   <script>
     const video = document.getElementById('promoVideo');
+    const secondVideo = document.getElementById('secondVideo');
     const playBtn = document.getElementById('playBtn');
-    const popup = document.getElementById('popup');
+    const playBtnSecond = document.getElementById('playBtnSecond');
+    const popup1 = document.getElementById('popup1');
+    const popup2 = document.getElementById('popup2');
     const preloader = document.getElementById('preloader');
     const mainContent = document.getElementById('mainContent');
 
-    // Ждём полной загрузки контента
-    window.addEventListener('load', () => {
-      // Даем браузеру чуть прогрузить видео и шрифт
+    // Сразу показываем контент
+    window.addEventListener('DOMContentLoaded', () => {
+      // Показываем основной контент
+      mainContent.classList.add('visible');
+      
+      // Предзагружаем видео
+      video.load();
+      secondVideo.load();
+      
+      // Скрываем прелоадер через 100ms (чтобы контент успел загрузиться)
       setTimeout(() => {
         preloader.classList.add('hidden');
-        mainContent.classList.add('visible');
-        // Принудительно загружаем превью, если видео не сразу доступно
-        video.load();
-      }, 500);
+      }, 100);
     });
 
-    // Кнопка "Испытать удачу"
+    // Кнопка "Испытать удачу" под первым видео
     playBtn.addEventListener('click', () => {
       if (navigator.vibrate) navigator.vibrate(100);
       playBtn.style.display = 'none';
       video.muted = false;
       video.play().catch(() => {
-        // если браузер блокирует автоплей — разрешим со звуком вручную
         video.muted = true;
         video.play();
       });
-      setTimeout(() => popup.classList.add('active'), 13000);
+      setTimeout(() => popup1.classList.add('active'), 13000);
     });
+
+    // Кнопка "Испытать удачу" под вторым видео
+    playBtnSecond.addEventListener('click', () => {
+      if (navigator.vibrate) navigator.vibrate(100);
+      playBtnSecond.style.display = 'none';
+      secondVideo.muted = false;
+      secondVideo.play().catch(() => {
+        secondVideo.muted = true;
+        secondVideo.play();
+      });
+      setTimeout(() => popup2.classList.add('active'), 13000);
+    });
+
+    // Закрытие попапов при клике на фон
+    popup1.addEventListener('click', (e) => {
+      if (e.target === popup1) {
+        popup1.classList.remove('active');
+      }
+    });
+
+    popup2.addEventListener('click', (e) => {
+      if (e.target === popup2) {
+        popup2.classList.remove('active');
+      }
+    });
+
+    // Если страница уже загружена (например, из кэша)
+    if (document.readyState === 'complete') {
+      mainContent.classList.add('visible');
+      preloader.classList.add('hidden');
+    }
   </script>
 </body>
 </html>
